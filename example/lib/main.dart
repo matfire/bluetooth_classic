@@ -22,11 +22,22 @@ class _MyAppState extends State<MyApp> {
   List<Device> _devices = [];
   List<Device> _discoveredDevices = [];
   bool _scanning = false;
-
+  int _deviceStatus = Device.disconnected;
+  Uint8List _data = Uint8List(0);
   @override
   void initState() {
     super.initState();
     initPlatformState();
+    _bluetoothClassicPlugin.onDeviceStatusChanged().listen((event) {
+      setState(() {
+        _deviceStatus = event;
+      });
+    });
+    _bluetoothClassicPlugin.onDeviceDataReceived().listen((event) {
+      setState(() {
+        _data = Uint8List.fromList([..._data, ...event]);
+      });
+    });
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -89,6 +100,7 @@ class _MyAppState extends State<MyApp> {
         body: SingleChildScrollView(
           child: Column(
             children: [
+              Text("Device status is $_deviceStatus"),
               TextButton(
                 onPressed: () async {
                   await _bluetoothClassicPlugin.initPermissions();
@@ -99,15 +111,35 @@ class _MyAppState extends State<MyApp> {
                 onPressed: _getDevices,
                 child: const Text("Get Paired Devices"),
               ),
+              TextButton(
+                onPressed: _deviceStatus == Device.connected
+                    ? () async {
+                        await _bluetoothClassicPlugin.disconnect();
+                      }
+                    : null,
+                child: const Text("disconnect"),
+              ),
+              TextButton(
+                onPressed: _deviceStatus == Device.connected
+                    ? () async {
+                        await _bluetoothClassicPlugin.write("ping");
+                      }
+                    : null,
+                child: const Text("send ping"),
+              ),
               Center(
                 child: Text('Running on: $_platformVersion\n'),
               ),
               ...[
                 for (var device in _devices)
                   TextButton(
-                      onPressed: () {
-                        _bluetoothClassicPlugin.connect(device.address,
+                      onPressed: () async {
+                        await _bluetoothClassicPlugin.connect(device.address,
                             "00001101-0000-1000-8000-00805f9b34fb");
+                        setState(() {
+                          _discoveredDevices = [];
+                          _devices = [];
+                        });
                       },
                       child: Text(device.name ?? device.address))
               ],
@@ -119,6 +151,7 @@ class _MyAppState extends State<MyApp> {
                 for (var device in _discoveredDevices)
                   Text(device.name ?? device.address)
               ],
+              Text("Received data: ${String.fromCharCodes(_data)}"),
             ],
           ),
         ),

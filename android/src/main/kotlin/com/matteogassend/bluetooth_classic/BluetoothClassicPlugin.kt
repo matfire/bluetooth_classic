@@ -42,9 +42,9 @@ class BluetoothClassicPlugin: FlutterPlugin, MethodCallHandler, PluginRegistry.R
   private lateinit var bluetoothDeviceChannel: EventChannel
   private var bluetoothDeviceChannelSink: EventSink ?= null
   private lateinit var bluetoothReadChannel: EventChannel
-  private var bluetoothReadChannelSink : EventChannel.EventSink ?= null
+  private var bluetoothReadChannelSink : EventSink ?= null
   private lateinit var bluetoothStatusChannel: EventChannel
-  private var bluetoothStatusChannelSink: EventChannel.EventSink ?= null
+  private var bluetoothStatusChannelSink: EventSink ?= null
   private lateinit var ba: BluetoothAdapter
   private lateinit var pluginActivity: Activity
   private lateinit var application: Context
@@ -57,7 +57,7 @@ class BluetoothClassicPlugin: FlutterPlugin, MethodCallHandler, PluginRegistry.R
   private var device: BluetoothDevice ?= null
 
 
-  private inner class ConnectedThread(private val socket: BluetoothSocket): Thread() {
+  private inner class ConnectedThread(socket: BluetoothSocket): Thread() {
 
     private val inputStream = socket.inputStream
     private val outputStream = socket.outputStream
@@ -137,12 +137,9 @@ class BluetoothClassicPlugin: FlutterPlugin, MethodCallHandler, PluginRegistry.R
     ba = BluetoothAdapter.getDefaultAdapter()
     channel.setMethodCallHandler(this)
     looper = flutterPluginBinding.applicationContext.mainLooper
-
     application = flutterPluginBinding.applicationContext
-
-
     bluetoothDeviceChannel.setStreamHandler(object: StreamHandler {
-      override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+      override fun onListen(arguments: Any?, events: EventSink?) {
           bluetoothDeviceChannelSink = events
       }
 
@@ -171,9 +168,9 @@ class BluetoothClassicPlugin: FlutterPlugin, MethodCallHandler, PluginRegistry.R
   }
 
   override fun onMethodCall(call: MethodCall, result: Result) {
-
+    Log.i("method_call", call.method)
     when(call.method) {
-      "getPlatformVersion" -> result.success("Android ${android.os.Build.VERSION.RELEASE}")
+      "getPlatformVersion" -> result.success("Android ${Build.VERSION.RELEASE}")
       "initPermissions" -> initPermissions(result)
       "getDevices" -> getDevices(result)
       "startDiscovery" -> startScan(result)
@@ -181,14 +178,40 @@ class BluetoothClassicPlugin: FlutterPlugin, MethodCallHandler, PluginRegistry.R
       "connect" -> connect(result, call.argument<String>("deviceId")!!,
         call.argument<String>("serviceUUID")!!
       )
+      "disconnect" -> disconnect(result)
+      "write" -> write(result, call.argument<String>("message")!!)
       else -> result.notImplemented()
     }
+  }
+
+  private fun write(result: Result, message: String) {
+    Log.i("write_handle", "inside write handle")
+    if (thread != null) {
+      thread!!.write(message.toByteArray())
+      result.success(true)
+    } else {
+      result.error("write_impossible", "could not send message to unconnected device", null)
+    }
+  }
+
+  private fun disconnect(result: Result) {
+    device = null
+    android.util.Log.i("Bluetooth Disconnect", "device removed from memory")
+    thread!!.interrupt()
+    android.util.Log.i("Bluetooth Disconnect", "read thread closed")
+    thread = null
+    android.util.Log.i("Bluetooth Disconnect", "read thread freed")
+    socket!!.close()
+    android.util.Log.i("Bluetooth Disconnect", "rfcomm socket closed")
+    publishBluetoothStatus(0)
+    android.util.Log.i("Bluetooth Disconnect", "disconnected")
+    result.success(true)
   }
 
   private fun connect(result: Result, deviceId: String, serviceUuid: String) {
     try {
       publishBluetoothStatus(1)
-      device = ba!!.getRemoteDevice(deviceId)
+      device = ba.getRemoteDevice(deviceId)
       android.util.Log.i("Bluetooth Connection", "device found")
       assert(device != null)
       socket = device?.createRfcommSocketToServiceRecord(UUID.fromString(serviceUuid))

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'bluetooth_classic_method_channel.dart';
@@ -48,7 +50,24 @@ abstract class BluetoothClassicPlatform extends PlatformInterface {
     throw UnimplementedError('onDeviceDiscovered() has not been implemented.');
   }
 
+  Stream<int> onDeviceStatusChanged() {
+    throw UnimplementedError('onDeviceStatus() has not been implemented.');
+  }
+
+  Stream<Uint8List> onDeviceDataReceived() {
+    throw UnimplementedError(
+        'onDeviceDataReceived() has not been implemented.');
+  }
+
   Future<bool> connect(String address, String serviceUUID) {
     throw UnimplementedError('connect() has not been implemented.');
+  }
+
+  Future<bool> disconnect() {
+    throw UnimplementedError('disconnect() has not been implemented.');
+  }
+
+  Future<bool> write(String message) {
+    throw UnimplementedError('write() has not been implemented.');
   }
 }
