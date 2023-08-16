@@ -1,3 +1,7 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+* scan for nearby devices
+* get already paired devices
+* connect to device
+* read data sent from device
+* write data to device
