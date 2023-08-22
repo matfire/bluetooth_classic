@@ -10,7 +10,7 @@
 - check that permissions are granted to use the device
 - get already paired devices
 - scan for devices
-- connect to a device
+- connect & disconnect to a device
 - read from connected device
 - write to connected device
 
@@ -76,6 +76,9 @@ _bluetoothClassicPlugin.onDeviceDataReceived().listen((event) {
     _data = Uint8List.fromList([..._data, ...event]);
   });
 });
+
+// disconnect when done
+await _bluetoothClassicPlugin.disconnect();
 
 ```
 
