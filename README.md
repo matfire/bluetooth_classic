@@ -30,7 +30,7 @@ For a list of functions and their definitions, you can look at the documentation
 import 'package:bluetooth_classic/bluetooth_classic.dart';
 
 final _bluetoothClassicPlugin = BluetoothClassic();
-await _bluetoothClassicPlugin.initPermissions()
+await _bluetoothClassicPlugin.initPermissions();
 List<Device> _discoveredDevices = await _bluetoothClassicPlugin.getPairedDevices();
 ```
 
@@ -42,6 +42,7 @@ import 'package:bluetooth_classic/models/device.dart';
 
 final _bluetoothClassicPlugin = BluetoothClassic();
 List<Device> _discoveredDevices = [];
+await _bluetoothClassicPlugin.initPermissions();
 _bluetoothClassicPlugin.onDeviceDiscovered().listen(
   (event) {
     _discoveredDevices = [..._discoveredDevices, event];
@@ -53,6 +54,30 @@ await _bluetoothClassicPlugin.stopScan();
 
 ```
 
+### Connecting to a device, reading and sending data to it
+
+```dart
+import 'package:bluetooth_classic/bluetooth_classic.dart';
+
+final _bluetoothClassicPlugin = BluetoothClassic();
+Uint8List _data = Uint8List(0);
+
+await _bluetoothClassicPlugin.initPermissions();
+// connect to a device with its MAC address and the application uuid you want to use (in this example, serial)
+await _bluetoothClassicPlugin.connect("AA:AA:AA:AA", "00001101-0000-1000-8000-00805f9b34fb");
+
+// NB: I'm not doing error checking or seeing if the device is still connected in this code, check the [example folder](/example/lib/main.dart) for a more thorough demonstration
+// send data to device
+await _bluetoothClassicPlugin.write("ping");
+
+//
+_bluetoothClassicPlugin.onDeviceDataReceived().listen((event) {
+  setState(() {
+    _data = Uint8List.fromList([..._data, ...event]);
+  });
+});
+
+```
 
 ## Example Code
 
