@@ -5,3 +5,7 @@
 * connect to device
 * read data sent from device
 * write data to device
+
+## 0.0.2
+
+* Bugfix: Namespace required by @TrSaka
