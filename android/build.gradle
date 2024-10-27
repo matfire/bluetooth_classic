@@ -25,10 +25,11 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
+    compileSdkVersion 31
+
     //namespace    
     namespace 'com.matteogassend.bluetooth_classic'
 
-    compileSdkVersion 31
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
