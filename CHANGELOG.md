@@ -9,3 +9,7 @@
 ## 0.0.2
 
 * Bugfix: Namespace required by @TrSaka
+
+## 0.0.3
+
+* Bugfix: Commented TODO exception by @tortiolaware
