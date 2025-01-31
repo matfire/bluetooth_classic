@@ -1,6 +1,6 @@
 name: bluetooth_classic
 description: A Flutter plugin to connect to Bluetooth Classic devices, mainly designed to work with serial communication.
-version: 0.0.2
+version: 0.0.3
 homepage:
 repository: https://github.com/matfire/bluetooth_classic
 
