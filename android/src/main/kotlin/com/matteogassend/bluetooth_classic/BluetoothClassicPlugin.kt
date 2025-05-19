@@ -31,6 +31,8 @@ import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry
 import java.io.IOException
 import java.util.UUID
+import org.json.JSONObject
+import org.json.JSONException
 
 /** BluetoothClassicPlugin */
 class BluetoothClassicPlugin: FlutterPlugin, MethodCallHandler, PluginRegistry.RequestPermissionsResultListener, ActivityAware {
@@ -59,24 +61,39 @@ class BluetoothClassicPlugin: FlutterPlugin, MethodCallHandler, PluginRegistry.R
 
   private inner class ConnectedThread(socket: BluetoothSocket): Thread() {
 
-    private val inputStream = socket.inputStream
+ private val inputStream = socket.inputStream
     private val outputStream = socket.outputStream
-    private val buffer: ByteArray = ByteArray(1024)
+    private val buffer: ByteArray = ByteArray(4096*2)
+    private val messageBuffer = StringBuilder() // Add this line
     var readStream = true
-    override fun run() {
-      var numBytes: Int
-      while (readStream) {
+
+    
+   override fun run() {
+    val buffer = ByteArray(1024)
+
+    while (readStream) {
         try {
-          numBytes = inputStream.read(buffer)
-          android.util.Log.i("Bluetooth Read", "read $buffer")
-          Handler(Looper.getMainLooper()).post { publishBluetoothData(ByteArray(numBytes) { buffer[it] }) }
+            val numBytes = inputStream.read(buffer) // Blocking call
+            if (numBytes > 0) {
+                val data = buffer.copyOfRange(0, numBytes)
+
+                Log.d("BT_Read", "Bytes received: $numBytes")
+                Log.d("BT_Read", "Data as String: [${String(data, Charsets.UTF_8)}]")
+
+                // Send the raw bytes to Dart
+                Handler(Looper.getMainLooper()).post {
+                    publishBluetoothData(data)
+                }
+            }
         } catch (e: IOException) {
-          android.util.Log.e("Bluetooth Read", "input stream disconnected", e)
-          Handler(looper).post { publishBluetoothStatus(0) }
-          readStream = false
+            Log.e("BT_Read", "Input stream disconnected", e)
+            Handler(Looper.getMainLooper()).post {
+                publishBluetoothStatus(0)
+            }
+            readStream = false
         }
-      }
     }
+}
 
     fun write(bytes: ByteArray) {
       try {
