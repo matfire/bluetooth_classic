@@ -76,17 +76,14 @@ class BluetoothClassicPlugin: FlutterPlugin, MethodCallHandler, PluginRegistry.R
             val numBytes = inputStream.read(buffer) 
             if (numBytes > 0) {
                 val data = buffer.copyOfRange(0, numBytes)
-
-                Log.d("BT_Read", "Bytes received: $numBytes")
-                Log.d("BT_Read", "Data as String: [${String(data, Charsets.UTF_8)}]")
-
-                // Send the raw bytes to Dart
+                // Log.d("BT_Read", "Bytes received: $numBytes")
+                // Log.d("BT_Read", "Data as String: [${String(data, Charsets.UTF_8)}]")
                 Handler(Looper.getMainLooper()).post {
                     publishBluetoothData(data)
                 }
             }
         } catch (e: IOException) {
-            Log.e("BT_Read", "Input stream disconnected", e)
+            // Log.e("BT_Read", "Input stream disconnected", e)
             Handler(Looper.getMainLooper()).post {
                 publishBluetoothStatus(0)
             }
