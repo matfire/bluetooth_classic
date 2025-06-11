@@ -72,6 +72,6 @@ abstract class BluetoothClassicPlatform extends PlatformInterface {
   }
 
   Future<bool> writeBytes(Uint8List message) {
-    throw UnimplementedError('write() has not been implemented.');
+    throw UnimplementedError('writeBytes() has not been implemented.');
   }
 }

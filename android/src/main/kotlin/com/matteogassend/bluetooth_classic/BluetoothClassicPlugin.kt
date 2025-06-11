@@ -203,7 +203,7 @@ class BluetoothClassicPlugin: FlutterPlugin, MethodCallHandler, PluginRegistry.R
   }
 
   private fun writeBytes(result: Result, message: ByteArray) {
-    Log.i("write_handle", "inside write handle")
+    Log.i("write_handle", "inside writeBytes handle")
     if (thread != null) {
         thread!!.write(message)
         result.success(true)
