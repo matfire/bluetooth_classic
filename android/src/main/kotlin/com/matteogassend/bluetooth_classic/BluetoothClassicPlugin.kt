@@ -64,7 +64,7 @@ class BluetoothClassicPlugin: FlutterPlugin, MethodCallHandler, PluginRegistry.R
  private val inputStream = socket.inputStream
     private val outputStream = socket.outputStream
     private val buffer: ByteArray = ByteArray(4096*2)
-    private val messageBuffer = StringBuilder() // Add this line
+    private val messageBuffer = StringBuilder() 
     var readStream = true
 
     
@@ -73,7 +73,7 @@ class BluetoothClassicPlugin: FlutterPlugin, MethodCallHandler, PluginRegistry.R
 
     while (readStream) {
         try {
-            val numBytes = inputStream.read(buffer) // Blocking call
+            val numBytes = inputStream.read(buffer) 
             if (numBytes > 0) {
                 val data = buffer.copyOfRange(0, numBytes)
 
