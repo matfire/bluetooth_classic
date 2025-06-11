@@ -208,7 +208,7 @@ class BluetoothClassicPlugin: FlutterPlugin, MethodCallHandler, PluginRegistry.R
         thread!!.write(message)
         result.success(true)
     } else {
-        result.error("write_impossible", "could not send message to unconnected device", null)
+        result.error("write_bytes_impossible", "could not send message to unconnected device", null)
     }
   }
 
