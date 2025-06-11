@@ -47,4 +47,8 @@ class BluetoothClassic {
   Future<bool> write(String message) {
     return BluetoothClassicPlatform.instance.write(message);
   }
+
+  Future<bool> writeBytes(Uint8List message) {
+    return BluetoothClassicPlatform.instance.writeBytes(message);
+  }
 }

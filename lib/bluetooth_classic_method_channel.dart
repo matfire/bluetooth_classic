@@ -132,4 +132,11 @@ class MethodChannelBluetoothClassic extends BluetoothClassicPlatform {
         .invokeMethod<bool>("write", <String, String>{"message": message});
     return res!;
   }
+
+  @override
+  Future<bool> writeBytes(Uint8List message) async {
+    var res = await methodChannel
+        .invokeMethod<bool>("writeBytes", message);
+    return res!;
+  }
 }
